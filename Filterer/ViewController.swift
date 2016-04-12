@@ -200,9 +200,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             
             filteredImage = imageProcessor.rgbaImage!.toUIImage()
             
-            if (filteredImage != nil) {
-                compareButton.enabled = true
-            }
+            compareButton.enabled = filteredImage != nil
             
             imageView.image = filteredImage
             
