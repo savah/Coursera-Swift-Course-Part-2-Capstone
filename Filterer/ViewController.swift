@@ -17,6 +17,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBOutlet var imageView: UIImageView!
     
+    @IBOutlet weak var overlayImageView: UIImageView!
     @IBOutlet var secondaryMenu: UIView!
     @IBOutlet var bottomMenu: UIView!
     
@@ -24,6 +25,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBOutlet weak var secondaryStackView: UIStackView!
     @IBOutlet weak var compareButton: UIButton!
+    @IBOutlet weak var informationView: UIView!
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -39,16 +41,25 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         secondaryMenu.translatesAutoresizingMaskIntoConstraints = false
         originalImage = imageView.image
         compareButton.enabled = false
+        informationView.layer.cornerRadius = 8.0
+        informationView.clipsToBounds = true
+        informationView.hidden = false
     }
     
     
     @IBAction func onPressImageView(sender: UILongPressGestureRecognizer) {
         switch sender.state {
         case .Began:
-            imageView.image = originalImage
+            self.informationView.hidden = false
+            UIView.animateWithDuration(0.4) {
+                self.overlayImageView.alpha = 0
+            }
             break
         case .Ended:
-            imageView.image = filteredImage
+            self.informationView.hidden = true
+            UIView.animateWithDuration(0.4) {
+                self.overlayImageView.alpha = 1
+            }
             break
         default:
             break
@@ -113,6 +124,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         if (sender.selected) {
             hideSecondaryMenu()
             sender.selected = false
+            imageView.image = originalImage
+            informationView.hidden = false
             
         } else {
             showSecondaryMenu()
@@ -150,7 +163,23 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     @IBAction func onCompare(sender: UIButton) {
-        imageView.image = originalImage
+        
+        let isFiltered:Bool = self.overlayImageView.alpha == 1
+        
+        if (!isFiltered) {
+            UIView.animateWithDuration(0.4) {
+                self.overlayImageView.alpha = 1
+            }
+        } else {
+            UIView.animateWithDuration(0.4) {
+                self.overlayImageView.alpha = 0
+            }
+            informationView.hidden = false;
+        }
+        
+        sender.selected = isFiltered
+        
+        
     }
     
     // FILTER ACTIONS
@@ -183,10 +212,16 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func applyFilter(aFilter: Filter, withSender sender: UIButton) {
+        informationView.hidden = !sender.selected
+        
         if (sender.selected) {
             imageView.image = originalImage
             compareButton.enabled = false;
             sender.selected = false
+            UIView.animateWithDuration(0.4) {
+                self.overlayImageView.alpha = 0
+            }
+            
         } else {
             for view in secondaryStackView.subviews {
                 if let btn = view as? UIButton {
@@ -202,9 +237,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             
             compareButton.enabled = filteredImage != nil
             
-            imageView.image = filteredImage
+            overlayImageView.image = filteredImage
+            UIView.animateWithDuration(0.4) {
+                self.overlayImageView.alpha = 1
+            }
             
         }
+        compareButton.selected = false
     }
 
 }
