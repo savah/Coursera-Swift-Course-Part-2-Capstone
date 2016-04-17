@@ -15,6 +15,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     var imageProcessor: ImageProcessor?
     
+    let imageFilters = [0:RedFilter(withIntensity: 255), 1:GreenFilter(withIntensity: 255), 2:BlueFilter(withIntensity: 255), 3:GrayscaleFilter()]
+    
     @IBOutlet var imageView: UIImageView!
     
     @IBOutlet weak var overlayImageView: UIImageView!
@@ -26,6 +28,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var secondaryStackView: UIStackView!
     @IBOutlet weak var compareButton: UIButton!
     @IBOutlet weak var informationView: UIView!
+    
+    @IBOutlet var sliderMenu: UIView!
+    @IBOutlet weak var editButton: UIButton!
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -44,6 +49,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         informationView.layer.cornerRadius = 8.0
         informationView.clipsToBounds = true
         informationView.hidden = false
+        filterPlaceholders()
     }
     
     
@@ -119,45 +125,60 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         dismissViewControllerAnimated(true, completion: nil)
     }
     
+    @IBAction func onPressEdit(sender: UIButton) {
+        if (sender.selected) {
+            hideSecondaryMenu(withView: self.sliderMenu)
+            sender.selected = false
+            
+        } else {
+            showSecondaryMenu(withView: self.sliderMenu)
+            sender.selected = true
+        }
+    }
+
+    
     // MARK: Filter Menu
     @IBAction func onFilter(sender: UIButton) {
         if (sender.selected) {
-            hideSecondaryMenu()
+            hideSecondaryMenu(withView: self.secondaryMenu)
             sender.selected = false
             imageView.image = originalImage
             informationView.hidden = false
+            UIView.animateWithDuration(0.4){
+                self.overlayImageView.alpha = 0
+            }
             
         } else {
-            showSecondaryMenu()
+            showSecondaryMenu(withView: self.secondaryMenu)
             sender.selected = true
         }
     }
     
-    func showSecondaryMenu() {
-        view.addSubview(secondaryMenu)
+    func showSecondaryMenu(withView theView: UIView) {
+        view.addSubview(theView)
         
-        let bottomConstraint = secondaryMenu.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
-        let leftConstraint = secondaryMenu.leftAnchor.constraintEqualToAnchor(view.leftAnchor)
-        let rightConstraint = secondaryMenu.rightAnchor.constraintEqualToAnchor(view.rightAnchor)
+        let bottomConstraint = theView.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
+        let leftConstraint = theView.leftAnchor.constraintEqualToAnchor(view.leftAnchor)
+        let rightConstraint = theView.rightAnchor.constraintEqualToAnchor(view.rightAnchor)
         
-        let heightConstraint = secondaryMenu.heightAnchor.constraintEqualToConstant(44)
+        let heightConstraint = theView.heightAnchor.constraintEqualToConstant(44)
         
         NSLayoutConstraint.activateConstraints([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
         
         view.layoutIfNeeded()
         
-        self.secondaryMenu.alpha = 0
+        theView.alpha = 0
         UIView.animateWithDuration(0.4) {
-            self.secondaryMenu.alpha = 1.0
+            theView.alpha = 1.0
         }
     }
 
-    func hideSecondaryMenu() {
+    func hideSecondaryMenu(withView theView:UIView) {
         UIView.animateWithDuration(0.4, animations: {
-            self.secondaryMenu.alpha = 0
+            theView.alpha = 0
             }) { completed in
                 if completed == true {
-                    self.secondaryMenu.removeFromSuperview()
+                    theView.removeFromSuperview()
                 }
         }
     }
@@ -228,6 +249,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                     btn.selected = (btn === sender)
                 }
             }
+            self.overlayImageView.alpha = 0.5
             
             let imageProcessor = ImageProcessor(withUIImage: originalImage!)
             
@@ -235,7 +257,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             
             filteredImage = imageProcessor.rgbaImage!.toUIImage()
             
-            compareButton.enabled = filteredImage != nil
+            compareButton.enabled = (filteredImage != nil)
             
             overlayImageView.image = filteredImage
             UIView.animateWithDuration(0.4) {
@@ -244,6 +266,24 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             
         }
         compareButton.selected = false
+    }
+    
+    
+    func filterPlaceholders() {
+        
+        for view in secondaryStackView.subviews {
+            if let btn = view as? UIButton {
+                let btnTag = btn.tag
+                let btnImage = btn.currentBackgroundImage
+                let imageProcessor = ImageProcessor(withUIImage: btnImage!)
+                
+                imageProcessor.applySingleFilter(self.imageFilters[btnTag]!)
+                
+                btn.setBackgroundImage(imageProcessor.rgbaImage!.toUIImage(), forState: UIControlState.Normal)
+                
+            }
+        }
+        
     }
 
 }
