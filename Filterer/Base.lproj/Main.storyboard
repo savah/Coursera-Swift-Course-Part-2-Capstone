@@ -137,23 +137,14 @@
                         <outlet property="filterButton" destination="C6B-1F-j0K" id="6Kf-1q-zun"/>
                         <outlet property="imageView" destination="aND-Em-4Dd" id="vbi-rB-DhQ"/>
                         <outlet property="informationView" destination="Std-mP-7mc" id="qU5-pa-Lyk"/>
+                        <outlet property="intensitySlider" destination="473-1E-hHU" id="SbR-Sm-bzJ"/>
                         <outlet property="overlayImageView" destination="xT3-L8-1BT" id="n5k-nt-ofn"/>
                         <outlet property="secondaryMenu" destination="ePS-oG-ZHP" id="Be7-JW-Iwe"/>
                         <outlet property="secondaryStackView" destination="n3M-NR-6VP" id="W3x-l9-axB"/>
-                        <outlet property="sliderMenu" destination="M2v-zg-SCa" id="cUM-aS-ipa"/>
+                        <outlet property="sliderMenu" destination="RKX-aY-Snl" id="3Te-RJ-0Xc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
-                <view contentMode="scaleToFill" id="M2v-zg-SCa" userLabel="Slider View">
-                    <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <subviews>
-                        <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="125" minValue="0.0" maxValue="255" translatesAutoresizingMaskIntoConstraints="NO" id="PhY-PW-A1M">
-                            <rect key="frame" x="18" y="0.0" width="204" height="129"/>
-                        </slider>
-                    </subviews>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                </view>
                 <view contentMode="scaleToFill" id="ePS-oG-ZHP">
                     <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -198,6 +189,22 @@
                         <constraint firstAttribute="bottom" secondItem="n3M-NR-6VP" secondAttribute="bottom" id="IFa-Q5-UOE"/>
                         <constraint firstItem="n3M-NR-6VP" firstAttribute="top" secondItem="ePS-oG-ZHP" secondAttribute="top" id="ciD-QT-Tl9"/>
                         <constraint firstItem="n3M-NR-6VP" firstAttribute="leading" secondItem="ePS-oG-ZHP" secondAttribute="leading" id="uEa-cd-VyS"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" id="RKX-aY-Snl">
+                    <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="473-1E-hHU">
+                            <rect key="frame" x="18" y="0.0" width="204" height="129"/>
+                        </slider>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="473-1E-hHU" secondAttribute="bottom" id="D5B-bZ-2EK"/>
+                        <constraint firstItem="473-1E-hHU" firstAttribute="top" secondItem="RKX-aY-Snl" secondAttribute="top" id="cD6-1z-Zq4"/>
+                        <constraint firstItem="473-1E-hHU" firstAttribute="leading" secondItem="RKX-aY-Snl" secondAttribute="leading" constant="20" id="q8M-q8-8yr"/>
+                        <constraint firstAttribute="trailing" secondItem="473-1E-hHU" secondAttribute="trailing" constant="20" id="v31-6K-gjs"/>
                     </constraints>
                 </view>
                 <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="d0X-n1-TUS">

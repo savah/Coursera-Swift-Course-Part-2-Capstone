@@ -32,6 +32,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet var sliderMenu: UIView!
     @IBOutlet weak var editButton: UIButton!
     
+    @IBOutlet weak var intensitySlider: UISlider!
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -126,6 +127,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     @IBAction func onPressEdit(sender: UIButton) {
+        secondaryMenu.removeFromSuperview();
         if (sender.selected) {
             hideSecondaryMenu(withView: self.sliderMenu)
             sender.selected = false
@@ -139,6 +141,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     // MARK: Filter Menu
     @IBAction func onFilter(sender: UIButton) {
+        sliderMenu.removeFromSuperview();
         if (sender.selected) {
             hideSecondaryMenu(withView: self.secondaryMenu)
             sender.selected = false
@@ -165,7 +168,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         NSLayoutConstraint.activateConstraints([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
         
-        view.layoutIfNeeded()
+        //view.layoutIfNeeded()
         
         theView.alpha = 0
         UIView.animateWithDuration(0.4) {
