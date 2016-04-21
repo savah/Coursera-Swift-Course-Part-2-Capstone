@@ -15,6 +15,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     var imageProcessor: ImageProcessor?
     
+    var intensityValue: Int
+    
+    var currentFilter: Filter?
+    
     let imageFilters = [0:RedFilter(withIntensity: 255), 1:GreenFilter(withIntensity: 255), 2:BlueFilter(withIntensity: 255), 3:GrayscaleFilter()]
     
     @IBOutlet var imageView: UIImageView!
@@ -22,29 +26,42 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var overlayImageView: UIImageView!
     @IBOutlet var secondaryMenu: UIView!
     @IBOutlet var bottomMenu: UIView!
+    @IBOutlet weak var secondaryStackView: UIStackView!
+    @IBOutlet weak var informationView: UIView!
+    @IBOutlet var sliderMenu: UIView!
+    
     
     @IBOutlet var filterButton: UIButton!
-    
-    @IBOutlet weak var secondaryStackView: UIStackView!
-    @IBOutlet weak var compareButton: UIButton!
-    @IBOutlet weak var informationView: UIView!
-    
-    @IBOutlet var sliderMenu: UIView!
     @IBOutlet weak var editButton: UIButton!
+    @IBOutlet weak var compareButton: UIButton!
+    
     
     @IBOutlet weak var intensitySlider: UISlider!
+    @IBOutlet weak var intensityValueLabel: UILabel!
+    
+    
     init() {
+        self.intensityValue = 128
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
+        self.intensityValue = 128
         super.init(coder: aDecoder)
     }
-    
+   
     override func viewDidLoad() {
         super.viewDidLoad()
         secondaryMenu.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8)
         secondaryMenu.translatesAutoresizingMaskIntoConstraints = false
+        sliderMenu.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8)
+        sliderMenu.translatesAutoresizingMaskIntoConstraints = false
+        
+        
+        intensityValueLabel.text = String(Int(self.intensitySlider.value))
+        
+        self.currentFilter = self.imageFilters[0]
+ 
         originalImage = imageView.image
         compareButton.enabled = false
         informationView.layer.cornerRadius = 8.0
@@ -128,6 +145,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBAction func onPressEdit(sender: UIButton) {
         secondaryMenu.removeFromSuperview();
+        filterButton.selected = false
         if (sender.selected) {
             hideSecondaryMenu(withView: self.sliderMenu)
             sender.selected = false
@@ -142,6 +160,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     // MARK: Filter Menu
     @IBAction func onFilter(sender: UIButton) {
         sliderMenu.removeFromSuperview();
+        editButton.selected = false
+        
         if (sender.selected) {
             hideSecondaryMenu(withView: self.secondaryMenu)
             sender.selected = false
@@ -154,8 +174,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         } else {
             showSecondaryMenu(withView: self.secondaryMenu)
             sender.selected = true
+            
         }
     }
+    
     
     func showSecondaryMenu(withView theView: UIView) {
         view.addSubview(theView)
@@ -164,11 +186,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let leftConstraint = theView.leftAnchor.constraintEqualToAnchor(view.leftAnchor)
         let rightConstraint = theView.rightAnchor.constraintEqualToAnchor(view.rightAnchor)
         
-        let heightConstraint = theView.heightAnchor.constraintEqualToConstant(44)
+        let height: CGFloat = theView.tag == 1 ? 72 : 44
+        
+        let heightConstraint = theView.heightAnchor.constraintEqualToConstant(height)
         
         NSLayoutConstraint.activateConstraints([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
         
-        //view.layoutIfNeeded()
+        view.layoutIfNeeded()
         
         theView.alpha = 0
         UIView.animateWithDuration(0.4) {
@@ -185,6 +209,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                 }
         }
     }
+
     
     @IBAction func onCompare(sender: UIButton) {
         
@@ -194,34 +219,49 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             UIView.animateWithDuration(0.4) {
                 self.overlayImageView.alpha = 1
             }
+            
         } else {
             UIView.animateWithDuration(0.4) {
                 self.overlayImageView.alpha = 0
             }
-            informationView.hidden = false;
         }
+        informationView.hidden = !isFiltered;
         
         sender.selected = isFiltered
-        
-        
+    }
+    
+    
+    //SLIDER ACTIONS
+    
+    
+    @IBAction func onSliderValueChanged(sender: AnyObject) {
+        self.intensityValueLabel.text = String(Int(self.intensitySlider.value))
+        self.intensityValue = Int(self.intensitySlider.value)
+    }
+    
+    
+    @IBAction func onSliderTouchUpInside(sender: AnyObject) {
+        self.currentFilter?.intensity = Int(self.intensitySlider.value)
+        applyAFilter(self.currentFilter!)
     }
     
     // FILTER ACTIONS
     
     
     
+    
     @IBAction func onRed(sender: UIButton) {
-        let redFilter = RedFilter(withIntensity: 255)
+        let redFilter = RedFilter(withIntensity: self.intensityValue)
         applyFilter(redFilter, withSender: sender)
     }
     
     @IBAction func onGreen(sender: UIButton) {
-        let greenFilter = GreenFilter(withIntensity: 255)
+        let greenFilter = GreenFilter(withIntensity: self.intensityValue)
         applyFilter(greenFilter, withSender: sender)
     }
     
     @IBAction func onBlue(sender: UIButton) {
-        let blueFilter = BlueFilter(withIntensity: 255)
+        let blueFilter = BlueFilter(withIntensity: self.intensityValue)
         applyFilter(blueFilter, withSender: sender)
     }
     
@@ -238,6 +278,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     func applyFilter(aFilter: Filter, withSender sender: UIButton) {
         informationView.hidden = !sender.selected
         
+        self.currentFilter = aFilter
+        
+//        sender.backgroundColor = UIColor(white: 1, alpha: 0.5)
+        
+//        sender.layer.borderColor = UIColor.blueColor().CGColor
+        
         if (sender.selected) {
             imageView.image = originalImage
             compareButton.enabled = false;
@@ -247,25 +293,18 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             }
             
         } else {
+            
             for view in secondaryStackView.subviews {
                 if let btn = view as? UIButton {
                     btn.selected = (btn === sender)
                 }
             }
+            
             self.overlayImageView.alpha = 0.5
             
-            let imageProcessor = ImageProcessor(withUIImage: originalImage!)
-            
-            imageProcessor.applySingleFilter(aFilter)
-            
-            filteredImage = imageProcessor.rgbaImage!.toUIImage()
+            applyAFilter(aFilter)
             
             compareButton.enabled = (filteredImage != nil)
-            
-            overlayImageView.image = filteredImage
-            UIView.animateWithDuration(0.4) {
-                self.overlayImageView.alpha = 1
-            }
             
         }
         compareButton.selected = false
@@ -287,6 +326,21 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             }
         }
         
+    }
+    
+    
+    func applyAFilter(aFilter: Filter) {
+        
+        let imageProcessor = ImageProcessor(withUIImage: originalImage!)
+        
+        imageProcessor.applySingleFilter(aFilter)
+        
+        filteredImage = imageProcessor.rgbaImage!.toUIImage()
+        
+        overlayImageView.image = filteredImage
+        UIView.animateWithDuration(0.4) {
+            self.overlayImageView.alpha = 1
+        }
     }
 
 }
