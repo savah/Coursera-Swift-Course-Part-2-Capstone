@@ -11,7 +11,7 @@ import UIKit
 
 
 protocol Filterable {
-    func applyFilter(inout onPixel pixel: Pixel, withIntensity intensity: Int)
+    func applyFilter( onPixel pixel: inout Pixel, withIntensity intensity: Int)
 }
 
 class Filter : Filterable {
@@ -36,7 +36,7 @@ class Filter : Filterable {
         
     }
     
-    func applyFilter(inout onPixel pixel: Pixel, withIntensity intensity: Int) {
+    func applyFilter( onPixel pixel: inout Pixel, withIntensity intensity: Int) {
     }
     
     func minMaxRGB(number: Int) -> Int{
@@ -59,7 +59,7 @@ class ContrastFilter: Filter {
         super.init(withIntensity: intensity)
     }
     
-    override func applyFilter(inout onPixel pixel: Pixel, withIntensity intensity: Int) {
+    override func applyFilter( onPixel pixel: inout Pixel, withIntensity intensity: Int) {
         super.applyFilter(onPixel: &pixel, withIntensity: intensity)
         
         //calculate the contrast factor found @ http://www.dfstudios.co.uk/articles/programming/image-programming-algorithms/image-processing-algorithms-part-5-contrast-adjustment/
@@ -75,9 +75,9 @@ class ContrastFilter: Filter {
         var newGreen = contrastFactor * Float((greenVal - 128)) + 128
         var newBlue  = contrastFactor * Float((blueVal - 128)) + 128
         
-        newBlue = Float(minMaxRGB(newBlue))
-        newRed = Float(minMaxRGB(newRed))
-        newGreen = Float(minMaxRGB(newGreen))
+        newBlue = Float(minMaxRGB(number: newBlue))
+        newRed = Float(minMaxRGB(number: newRed))
+        newGreen = Float(minMaxRGB(number: newGreen))
         
         pixel.red = UInt8(newRed)
         pixel.green = UInt8(newGreen)
@@ -89,14 +89,14 @@ class ContrastFilter: Filter {
 
 class GrayscaleFilter: Filter {
     
-    override func applyFilter(inout onPixel pixel: Pixel, withIntensity intensity: Int) {
+    override func applyFilter( onPixel pixel: inout Pixel, withIntensity intensity: Int) {
         super.applyFilter(onPixel: &pixel, withIntensity: intensity)
         
         //calculate values found @ http://www.dfstudios.co.uk/articles/programming/image-programming-algorithms/image-processing-algorithms-part-3-greyscale-conversion/
         let grayScaleBlue = Float(pixel.blue) * 0.1140
         let grayScaleGreen = Float(pixel.green) * 0.5870
         let grayScaleRed = Float(pixel.red) * 0.2989
-        let newPixelColor = UInt8(minMaxRGB(grayScaleRed)) + UInt8(minMaxRGB(grayScaleBlue)) + UInt8(minMaxRGB(grayScaleGreen))
+        let newPixelColor = UInt8(minMaxRGB(number: grayScaleRed)) + UInt8(minMaxRGB(number: grayScaleBlue)) + UInt8(minMaxRGB(number: grayScaleGreen))
         
         
         pixel.red = newPixelColor
@@ -117,7 +117,7 @@ class GreenFilter: Filter {
         super.init(withIntensity: intensity)
     }
     
-    override func applyFilter(inout onPixel pixel: Pixel, withIntensity intensity: Int) {
+    override func applyFilter( onPixel pixel: inout Pixel, withIntensity intensity: Int) {
         super.applyFilter(onPixel: &pixel, withIntensity: intensity)
         
         pixel.green = UInt8(max(0, min(255, intensity)))
@@ -136,7 +136,7 @@ class RedFilter: Filter {
         super.init(withIntensity: intensity)
     }
     
-    override func applyFilter(inout onPixel pixel: Pixel, withIntensity intensity: Int) {
+    override func applyFilter( onPixel pixel: inout Pixel, withIntensity intensity: Int) {
         super.applyFilter(onPixel: &pixel, withIntensity: intensity)
         pixel.red = UInt8(max(0, min(255, intensity)))
         
@@ -154,7 +154,7 @@ class BlueFilter: Filter {
         super.init(withIntensity: intensity)
     }
     
-    override func applyFilter(inout onPixel pixel: Pixel, withIntensity intensity: Int) {
+    override func applyFilter( onPixel pixel: inout Pixel, withIntensity intensity: Int) {
         super.applyFilter(onPixel: &pixel, withIntensity: intensity)
         
         pixel.blue = UInt8(max(0, min(255, intensity)))
@@ -172,7 +172,7 @@ class AlphaFilter: Filter {
         super.init(withIntensity: intensity)
     }
     
-    override func applyFilter(inout onPixel pixel: Pixel, withIntensity intensity: Int) {
+    override func applyFilter( onPixel pixel: inout Pixel, withIntensity intensity: Int) {
         super.applyFilter(onPixel: &pixel, withIntensity: intensity)
         
         pixel.alpha = UInt8(max(0, min(255, intensity)))

@@ -52,9 +52,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
    
     override func viewDidLoad() {
         super.viewDidLoad()
-        secondaryMenu.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8)
+        secondaryMenu.backgroundColor = UIColor.white.withAlphaComponent(0.8)
         secondaryMenu.translatesAutoresizingMaskIntoConstraints = false
-        sliderMenu.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8)
+        sliderMenu.backgroundColor = UIColor.white.withAlphaComponent(0.8)
         sliderMenu.translatesAutoresizingMaskIntoConstraints = false
         
         
@@ -63,25 +63,25 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         self.currentFilter = self.imageFilters[0]
  
         originalImage = imageView.image
-        compareButton.enabled = false
+        compareButton.isEnabled = false
         informationView.layer.cornerRadius = 8.0
         informationView.clipsToBounds = true
-        informationView.hidden = false
+        informationView.isHidden = false
         filterPlaceholders()
     }
     
     
     @IBAction func onPressImageView(sender: UILongPressGestureRecognizer) {
         switch sender.state {
-        case .Began:
-            self.informationView.hidden = false
-            UIView.animateWithDuration(0.4) {
+        case .began:
+            self.informationView.isHidden = false
+            UIView.animate(withDuration: 0.4) {
                 self.overlayImageView.alpha = 0
             }
             break
-        case .Ended:
-            self.informationView.hidden = true
-            UIView.animateWithDuration(0.4) {
+        case .ended:
+            self.informationView.isHidden = true
+            UIView.animate(withDuration: 0.4) {
                 self.overlayImageView.alpha = 1
             }
             break
@@ -94,65 +94,65 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     // MARK: Share
     @IBAction func onShare(sender: AnyObject) {
         let activityController = UIActivityViewController(activityItems: ["Check out our really cool app", imageView.image!], applicationActivities: nil)
-        presentViewController(activityController, animated: true, completion: nil)
+        present(activityController, animated: true, completion: nil)
     }
     
     // MARK: New Photo
     @IBAction func onNewPhoto(sender: AnyObject) {
-        let actionSheet = UIAlertController(title: "New Photo", message: nil, preferredStyle: .ActionSheet)
+        let actionSheet = UIAlertController(title: "New Photo", message: nil, preferredStyle: .actionSheet)
         
-        actionSheet.addAction(UIAlertAction(title: "Camera", style: .Default, handler: { action in
+        actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { action in
             self.showCamera()
         }))
         
-        actionSheet.addAction(UIAlertAction(title: "Album", style: .Default, handler: { action in
+        actionSheet.addAction(UIAlertAction(title: "Album", style: .default, handler: { action in
             self.showAlbum()
         }))
         
-        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        self.presentViewController(actionSheet, animated: true, completion: nil)
+        self.present(actionSheet, animated: true, completion: nil)
     }
     
     func showCamera() {
         let cameraPicker = UIImagePickerController()
         cameraPicker.delegate = self
-        cameraPicker.sourceType = .Camera
+        cameraPicker.sourceType = .camera
         
-        presentViewController(cameraPicker, animated: true, completion: nil)
+        present(cameraPicker, animated: true, completion: nil)
     }
     
     func showAlbum() {
         let cameraPicker = UIImagePickerController()
         cameraPicker.delegate = self
-        cameraPicker.sourceType = .PhotoLibrary
+        cameraPicker.sourceType = .photoLibrary
         
-        presentViewController(cameraPicker, animated: true, completion: nil)
+        present(cameraPicker, animated: true, completion: nil)
     }
     
     // MARK: UIImagePickerControllerDelegate
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-        dismissViewControllerAnimated(true, completion: nil)
-        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+        dismiss(animated: true, completion: nil)
+        if let image = info[UIImagePickerController.InfoKey.originalImage.rawValue] as? UIImage {
             imageView.image = image
             originalImage = image
         }
     }
     
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     @IBAction func onPressEdit(sender: UIButton) {
         secondaryMenu.removeFromSuperview();
-        filterButton.selected = false
-        if (sender.selected) {
+        filterButton.isSelected = false
+        if (sender.isSelected) {
             hideSecondaryMenu(withView: self.sliderMenu)
-            sender.selected = false
+            sender.isSelected = false
             
         } else {
             showSecondaryMenu(withView: self.sliderMenu)
-            sender.selected = true
+            sender.isSelected = true
         }
     }
 
@@ -160,20 +160,20 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     // MARK: Filter Menu
     @IBAction func onFilter(sender: UIButton) {
         sliderMenu.removeFromSuperview();
-        editButton.selected = false
+        editButton.isSelected = false
         
-        if (sender.selected) {
+        if (sender.isSelected) {
             hideSecondaryMenu(withView: self.secondaryMenu)
-            sender.selected = false
+            sender.isSelected = false
             imageView.image = originalImage
-            informationView.hidden = false
-            UIView.animateWithDuration(0.4){
+            informationView.isHidden = false
+            UIView.animate(withDuration: 0.4){
                 self.overlayImageView.alpha = 0
             }
             
         } else {
             showSecondaryMenu(withView: self.secondaryMenu)
-            sender.selected = true
+            sender.isSelected = true
             
         }
     }
@@ -182,26 +182,26 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     func showSecondaryMenu(withView theView: UIView) {
         view.addSubview(theView)
         
-        let bottomConstraint = theView.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
-        let leftConstraint = theView.leftAnchor.constraintEqualToAnchor(view.leftAnchor)
-        let rightConstraint = theView.rightAnchor.constraintEqualToAnchor(view.rightAnchor)
+        let bottomConstraint = theView.bottomAnchor.constraint(equalTo: bottomMenu.topAnchor)
+        let leftConstraint = theView.leftAnchor.constraint(equalTo: view.leftAnchor)
+        let rightConstraint = theView.rightAnchor.constraint(equalTo: view.rightAnchor)
         
         let height: CGFloat = theView.tag == 1 ? 72 : 44
         
-        let heightConstraint = theView.heightAnchor.constraintEqualToConstant(height)
+        let heightConstraint = theView.heightAnchor.constraint(equalToConstant: height)
         
-        NSLayoutConstraint.activateConstraints([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
+        NSLayoutConstraint.activate([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
         
         view.layoutIfNeeded()
         
         theView.alpha = 0
-        UIView.animateWithDuration(0.4) {
+        UIView.animate(withDuration: 0.4) {
             theView.alpha = 1.0
         }
     }
 
     func hideSecondaryMenu(withView theView:UIView) {
-        UIView.animateWithDuration(0.4, animations: {
+        UIView.animate(withDuration: 0.4, animations: {
             theView.alpha = 0
             }) { completed in
                 if completed == true {
@@ -216,18 +216,18 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let isFiltered:Bool = self.overlayImageView.alpha == 1
         
         if (!isFiltered) {
-            UIView.animateWithDuration(0.4) {
+            UIView.animate(withDuration: 0.4) {
                 self.overlayImageView.alpha = 1
             }
             
         } else {
-            UIView.animateWithDuration(0.4) {
+            UIView.animate(withDuration: 0.4) {
                 self.overlayImageView.alpha = 0
             }
         }
-        informationView.hidden = !isFiltered;
+        informationView.isHidden = !isFiltered;
         
-        sender.selected = isFiltered
+        sender.isSelected = isFiltered
     }
     
     
@@ -242,7 +242,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBAction func onSliderTouchUpInside(sender: AnyObject) {
         self.currentFilter?.intensity = Int(self.intensitySlider.value)
-        applyAFilter(self.currentFilter!)
+        applyAFilter(aFilter: self.currentFilter!)
     }
     
     // FILTER ACTIONS
@@ -252,31 +252,31 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBAction func onRed(sender: UIButton) {
         let redFilter = RedFilter(withIntensity: self.intensityValue)
-        applyFilter(redFilter, withSender: sender)
+        applyFilter(aFilter: redFilter, withSender: sender)
     }
     
     @IBAction func onGreen(sender: UIButton) {
         let greenFilter = GreenFilter(withIntensity: self.intensityValue)
-        applyFilter(greenFilter, withSender: sender)
+        applyFilter(aFilter: greenFilter, withSender: sender)
     }
     
     @IBAction func onBlue(sender: UIButton) {
         let blueFilter = BlueFilter(withIntensity: self.intensityValue)
-        applyFilter(blueFilter, withSender: sender)
+        applyFilter(aFilter: blueFilter, withSender: sender)
     }
     
     @IBAction func onAlpha(sender: UIButton) {
         let alphaFilter = AlphaFilter()
-        applyFilter(alphaFilter, withSender: sender)
+        applyFilter(aFilter: alphaFilter, withSender: sender)
     }
     
     @IBAction func onGrayscale(sender: UIButton) {
         let grayscaleFilter = GrayscaleFilter()
-        applyFilter(grayscaleFilter, withSender: sender)
+        applyFilter(aFilter: grayscaleFilter, withSender: sender)
     }
     
     func applyFilter(aFilter: Filter, withSender sender: UIButton) {
-        informationView.hidden = !sender.selected
+        informationView.isHidden = !sender.isSelected
         
         self.currentFilter = aFilter
         
@@ -284,11 +284,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
 //        sender.layer.borderColor = UIColor.blueColor().CGColor
         
-        if (sender.selected) {
+        if (sender.isSelected) {
             imageView.image = originalImage
-            compareButton.enabled = false;
-            sender.selected = false
-            UIView.animateWithDuration(0.4) {
+            compareButton.isEnabled = false;
+            sender.isSelected = false
+            UIView.animate(withDuration: 0.4) {
                 self.overlayImageView.alpha = 0
             }
             
@@ -296,18 +296,18 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             
             for view in secondaryStackView.subviews {
                 if let btn = view as? UIButton {
-                    btn.selected = (btn === sender)
+                    btn.isSelected = (btn === sender)
                 }
             }
             
             self.overlayImageView.alpha = 0.5
             
-            applyAFilter(aFilter)
+            applyAFilter(aFilter: aFilter)
             
-            compareButton.enabled = (filteredImage != nil)
+            compareButton.isEnabled = (filteredImage != nil)
             
         }
-        compareButton.selected = false
+        compareButton.isSelected = false
     }
     
     
@@ -319,10 +319,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                 let btnImage = btn.currentBackgroundImage
                 let imageProcessor = ImageProcessor(withUIImage: btnImage!)
                 
-                imageProcessor.applySingleFilter(self.imageFilters[btnTag]!)
+                imageProcessor.applySingleFilter(aFilter: self.imageFilters[btnTag]!)
                 
-                btn.setBackgroundImage(imageProcessor.rgbaImage!.toUIImage(), forState: UIControlState.Normal)
-                
+                btn.setBackgroundImage(imageProcessor.rgbaImage!.toUIImage(), for: .normal)
             }
         }
         
@@ -333,12 +332,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         let imageProcessor = ImageProcessor(withUIImage: originalImage!)
         
-        imageProcessor.applySingleFilter(aFilter)
+        imageProcessor.applySingleFilter(aFilter: aFilter)
         
         filteredImage = imageProcessor.rgbaImage!.toUIImage()
         
         overlayImageView.image = filteredImage
-        UIView.animateWithDuration(0.4) {
+        UIView.animate(withDuration: 0.4) {
             self.overlayImageView.alpha = 1
         }
     }

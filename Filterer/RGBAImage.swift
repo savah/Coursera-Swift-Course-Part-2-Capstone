@@ -47,37 +47,51 @@ public struct RGBAImage {
     public var height: Int
     
     public init?(image: UIImage) {
-        guard let cgImage = image.CGImage else { return nil }
+        guard let cgImage = image.cgImage else { return nil }
         
         // Redraw image for correct pixel format
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         
-        var bitmapInfo: UInt32 = CGBitmapInfo.ByteOrder32Big.rawValue
-        bitmapInfo |= CGImageAlphaInfo.PremultipliedLast.rawValue & CGBitmapInfo.AlphaInfoMask.rawValue
+        var bitmapInfo: UInt32 = CGBitmapInfo.byteOrder32Big.rawValue
+        bitmapInfo |= CGImageAlphaInfo.premultipliedLast.rawValue & CGBitmapInfo.alphaInfoMask.rawValue
         
         width = Int(image.size.width)
         height = Int(image.size.height)
         let bytesPerRow = width * 4
         
-        let imageData = UnsafeMutablePointer<Pixel>.alloc(width * height)
         
-        guard let imageContext = CGBitmapContextCreate(imageData, width, height, 8, bytesPerRow, colorSpace, bitmapInfo) else { return nil }
-        CGContextDrawImage(imageContext, CGRect(origin: CGPointZero, size: image.size), cgImage)
-
+        let imageData = UnsafeMutablePointer<Pixel>.allocate(capacity: width * height)
+        
+        guard let imageContext = CGContext(data: imageData, width: width, height: height, bitsPerComponent: 8, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo) else { return nil }
+        imageContext.draw(cgImage, in: CGRect(origin: .zero, size: image.size))
+        
         pixels = UnsafeMutableBufferPointer<Pixel>(start: imageData, count: width * height)
+        imageData.deallocate()
     }
     
     public func toUIImage() -> UIImage? {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
-        var bitmapInfo: UInt32 = CGBitmapInfo.ByteOrder32Big.rawValue
-        bitmapInfo |= CGImageAlphaInfo.PremultipliedLast.rawValue & CGBitmapInfo.AlphaInfoMask.rawValue
+        var bitmapInfo: UInt32 = CGBitmapInfo.byteOrder32Big.rawValue
+        bitmapInfo |= CGImageAlphaInfo.premultipliedLast.rawValue & CGBitmapInfo.alphaInfoMask.rawValue
         
         let bytesPerRow = width * 4
 
-        let imageContext = CGBitmapContextCreateWithData(pixels.baseAddress, width, height, 8, bytesPerRow, colorSpace, bitmapInfo, nil, nil)
-        
-        guard let cgImage = CGBitmapContextCreateImage(imageContext) else {return nil}
-        let image = UIImage(CGImage: cgImage)
+        //let imageContext = CGBitmapContextCreateWithData(pixels.baseAddress, width, height, 8, bytesPerRow, colorSpace, bitmapInfo, nil, nil)
+        let imageContext = CGContext(
+            data: pixels.baseAddress,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: bytesPerRow,
+            space: colorSpace,
+            bitmapInfo: bitmapInfo
+        )
+        guard let context = imageContext,
+              let cgImage = context.makeImage() else {
+            return nil
+        }
+        //guard let cgImage = imageContext.makeImage() else {return nil}
+        let image = UIImage(cgImage: cgImage)
         
         return image
     }
